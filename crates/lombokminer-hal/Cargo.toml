@@ -1,0 +1,13 @@
+[package]
+name = "lombokminer-hal"
+description = "LombokMiner hardware abstraction: CPU thread pool, GPU (OpenCL/Vulkan), ASIC drivers"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+lombokminer-core = { workspace = true }
+tracing = { workspace = true }
+serde = { workspace = true }
+rand = { workspace = true }

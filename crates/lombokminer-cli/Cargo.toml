@@ -1,0 +1,23 @@
+[package]
+name = "lombokminer-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "lombokminer"
+path = "src/main.rs"
+
+[dependencies]
+lombokminer-core = { workspace = true }
+lombokminer-net = { workspace = true }
+lombokminer-hal = { workspace = true }
+lombokminer-security = { workspace = true }
+lombokminer-monitor = { workspace = true }
+lombokminer-config = { workspace = true }
+clap = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+hex = { workspace = true }
+serde_json = { workspace = true }

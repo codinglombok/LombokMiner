@@ -1,0 +1,29 @@
+# Build
+/target/
+**/*.rs.bk
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (user-specific, not committed)
+lombokminer.toml
+
+# Fuzz artifacts
+tests/fuzz/corpus/
+tests/fuzz/artifacts/
+
+# Docker volumes
+prometheus_data/
+grafana_data/
+
+/map
+/docs/*architecture*.*
+/docs/*masterplan*.*

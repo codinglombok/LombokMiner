@@ -1,0 +1,74 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/lombokminer-core",
+    "crates/lombokminer-net",
+    "crates/lombokminer-hal",
+    "crates/lombokminer-security",
+    "crates/lombokminer-monitor",
+    "crates/lombokminer-config",
+    "crates/lombokminer-cli",
+    "crates/lombokminer-daemon",
+    "crates/lombokminer-ffi",
+    "bindings/rust",
+    "tests/integration",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "Apache-2.0"
+repository = "https://github.com/codinglombok/lombokminer"
+authors = ["codinglombok"]
+
+[workspace.dependencies]
+# Internal crates
+lombokminer-core = { path = "crates/lombokminer-core" }
+lombokminer-net = { path = "crates/lombokminer-net" }
+lombokminer-hal = { path = "crates/lombokminer-hal" }
+lombokminer-security = { path = "crates/lombokminer-security" }
+lombokminer-monitor = { path = "crates/lombokminer-monitor" }
+lombokminer-config = { path = "crates/lombokminer-config" }
+
+# Async runtime — the ONE big dependency we allow
+tokio = { version = "1", features = ["full"] }
+
+# Serialization
+serde = { version = "=1.0.197", features = ["derive"] }
+serde_json = "=1.0.108"
+toml = "=0.7.6"
+
+# CLI / TUI
+ratatui = "=0.26.3"
+crossterm = "=0.27.0"
+clap = { version = "=4.4.18", features = ["derive"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "=0.3.18", features = ["env-filter", "json"] }
+
+# Hex encoding
+hex = "0.4"
+indexmap = "=2.2.6"
+
+# Byte utilities
+bytes = "=1.5.0"
+
+# Time
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+
+# Random
+rand = "=0.8.5"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.bench]
+inherits = "release"
+debug = true
+strip = false

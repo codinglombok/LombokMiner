@@ -1,0 +1,13 @@
+[package]
+name = "lombokminer-core"
+description = "LombokMiner core: SHA-256d hashing, block construction, difficulty calculation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+hex = { workspace = true }
+serde = { workspace = true }
+bytes = { workspace = true }
+rand = { workspace = true }

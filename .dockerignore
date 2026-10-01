@@ -1,0 +1,8 @@
+target/
+.git/
+.github/
+*.tar.gz
+*.zip
+Cargo.lock
+tests/fuzz/corpus/
+tests/fuzz/artifacts/

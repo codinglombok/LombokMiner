@@ -1,0 +1,45 @@
+[package]
+name = "lombokminer-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata.cargo-fuzz]
+fuzz-dir = "."
+
+[dependencies]
+libfuzzer-sys = "0.4"
+lombokminer-core = { path = "../../crates/lombokminer-core" }
+lombokminer-net = { path = "../../crates/lombokminer-net" }
+lombokminer-security = { path = "../../crates/lombokminer-security" }
+lombokminer-config = { path = "../../crates/lombokminer-config" }
+
+[[bin]]
+name = "fuzz_sha256d"
+path = "fuzz_targets/fuzz_sha256d.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_frame_decode"
+path = "fuzz_targets/fuzz_frame_decode.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_block_header"
+path = "fuzz_targets/fuzz_block_header.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_address_validate"
+path = "fuzz_targets/fuzz_address_validate.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_aead"
+path = "fuzz_targets/fuzz_aead.rs"
+doc = false
+
+[[bin]]
+name = "fuzz_config_parse"
+path = "fuzz_targets/fuzz_config_parse.rs"
+doc = false

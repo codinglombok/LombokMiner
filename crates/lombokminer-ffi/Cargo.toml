@@ -1,0 +1,16 @@
+[package]
+name = "lombokminer-ffi"
+description = "LombokMiner C FFI — exposes core functions for Python/PHP/Go bindings"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+lombokminer-core = { workspace = true }
+lombokminer-security = { workspace = true }
+lombokminer-hal = { workspace = true }
+hex = { workspace = true }

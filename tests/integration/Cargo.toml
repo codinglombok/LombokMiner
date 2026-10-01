@@ -1,0 +1,19 @@
+[package]
+name = "lombokminer-integration-tests"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[[test]]
+name = "e2e_test"
+path = "e2e_test.rs"
+
+[dependencies]
+lombokminer-core = { path = "../../crates/lombokminer-core" }
+lombokminer-net = { path = "../../crates/lombokminer-net" }
+lombokminer-hal = { path = "../../crates/lombokminer-hal" }
+lombokminer-security = { path = "../../crates/lombokminer-security" }
+lombokminer-monitor = { path = "../../crates/lombokminer-monitor" }
+lombokminer-config = { path = "../../crates/lombokminer-config" }
+hex = "0.4"
+serde_json = "=1.0.108"

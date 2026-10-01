@@ -1,0 +1,21 @@
+[package]
+name = "lombokminer"
+description = "LombokMiner — Bitcoin mining library. SHA-256d, Stratum V2, wallet validation, CPU mining."
+version = "1.0.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/codinglombok/lombokminer"
+keywords = ["bitcoin", "mining", "sha256", "stratum", "crypto"]
+categories = ["cryptography", "command-line-utilities"]
+readme = "README.md"
+
+# This crate re-exports the workspace crates as a single public API.
+# Users add `lombokminer = "1.0"` to their Cargo.toml and get everything.
+
+[dependencies]
+lombokminer-core = { path = "../../crates/lombokminer-core" }
+lombokminer-security = { path = "../../crates/lombokminer-security" }
+lombokminer-hal = { path = "../../crates/lombokminer-hal" }
+lombokminer-monitor = { path = "../../crates/lombokminer-monitor" }
+lombokminer-net = { path = "../../crates/lombokminer-net" }
+lombokminer-config = { path = "../../crates/lombokminer-config" }

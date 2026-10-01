@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LombokMiner Dashboard</title>
+<style>
+  :root {
+    --bg-0: #0a0e14;
+    --bg-1: #111820;
+    --bg-2: #1a2230;
+    --border: #253040;
+    --text-0: #e6edf3;
+    --text-1: #8b949e;
+    --text-2: #6e7681;
+    --green: #2ea043;
+    --green-dim: #1a3a2a;
+    --amber: #d29922;
+    --amber-dim: #3d2e0a;
+    --red: #f85149;
+    --red-dim: #3d1418;
+    --blue: #58a6ff;
+    --cyan: #39d2c0;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-0);
+    color: var(--text-0);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ─── Header ─────────────────────────────────────────────────── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--cyan); }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-1);
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  .status-dot.connected { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .status-dot.disconnected { background: var(--red); }
+
+  /* ─── Main Grid ──────────────────────────────────────────────── */
+  main {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  /* ─── Cards ──────────────────────────────────────────────────── */
+  .card {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-2);
+    margin-bottom: 12px;
+  }
+
+  .card-wide { grid-column: span 2; }
+  .card-full { grid-column: span 3; }
+
+  @media (max-width: 900px) {
+    .card-wide, .card-full { grid-column: span 1; }
+  }
+
+  /* ─── KPI Numbers ────────────────────────────────────────────── */
+  .kpi {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kpi-value {
+    font-family: var(--font-mono);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-0);
+  }
+
+  .kpi-unit {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-1);
+    margin-left: 4px;
+  }
+
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-1);
+    margin-top: 4px;
+  }
+
+  /* ─── Device Table ───────────────────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    color: var(--text-2);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .td-name {
+    font-family: var(--font-sans);
+    font-weight: 500;
+  }
+
+  .temp-ok { color: var(--green); }
+  .temp-warn { color: var(--amber); }
+  .temp-crit { color: var(--red); }
+
+  /* ─── Share Bar ──────────────────────────────────────────────── */
+  .share-bar {
+    display: flex;
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 12px 0;
+    background: var(--bg-2);
+  }
+
+  .share-bar-accepted { background: var(--green); }
+  .share-bar-rejected { background: var(--red); }
+  .share-bar-stale { background: var(--amber); }
+
+  .share-legend {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text-1);
+  }
+
+  .share-legend span::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .legend-accepted::before { background: var(--green); }
+  .legend-rejected::before { background: var(--red); }
+  .legend-stale::before { background: var(--amber); }
+
+  /* ─── Alerts ─────────────────────────────────────────────────── */
+  .alert-item {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .alert-item:last-child { margin-bottom: 0; }
+  .alert-warn { background: var(--amber-dim); border-left: 3px solid var(--amber); }
+  .alert-crit { background: var(--red-dim); border-left: 3px solid var(--red); }
+  .alert-info { background: var(--green-dim); border-left: 3px solid var(--green); }
+
+  .alert-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .alert-badge-warn { background: var(--amber); color: #000; }
+  .alert-badge-crit { background: var(--red); color: #fff; }
+  .no-alerts { color: var(--text-2); font-style: italic; }
+
+  /* ─── Pool List ──────────────────────────────────────────────── */
+  .pool-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .pool-item:last-child { border-bottom: none; }
+
+  .pool-url {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--blue);
+  }
+
+  .pool-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .pool-tag-active { background: var(--green-dim); color: var(--green); }
+  .pool-tag-standby { background: var(--bg-2); color: var(--text-2); }
+
+  /* ─── Footer ─────────────────────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 16px;
+    color: var(--text-2);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  footer a { color: var(--cyan); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Lombok<span>Miner</span></div>
+  <div class="header-status">
+    <span><span class="status-dot connected" id="ws-dot"></span><span id="ws-status">Connected</span></span>
+    <span id="uptime">0d 0h 0m</span>
+    <span id="protocol">Stratum V2</span>
+  </div>
+</header>
+
+<main>
+  <!-- KPI: Hashrate -->
+  <div class="card">
+    <div class="card-title">Total Hashrate</div>
+    <div class="kpi">
+      <div class="kpi-value" id="hashrate">0.00<span class="kpi-unit">H/s</span></div>
+      <div class="kpi-label" id="hashrate-label">Across 0 devices</div>
+    </div>
+  </div>
+
+  <!-- KPI: Shares -->
+  <div class="card">
+    <div class="card-title">Shares</div>
+    <div class="kpi">
+      <div class="kpi-value" id="shares-accepted">0</div>
+      <div class="kpi-label" id="shares-rate">Accept rate: 100%</div>
+    </div>
+    <div class="share-bar" id="share-bar"></div>
+    <div class="share-legend">
+      <span class="legend-accepted" id="legend-a">Accepted: 0</span>
+      <span class="legend-rejected" id="legend-r">Rejected: 0</span>
+      <span class="legend-stale" id="legend-s">Stale: 0</span>
+    </div>
+  </div>
+
+  <!-- KPI: Blocks -->
+  <div class="card">
+    <div class="card-title">Blocks Found</div>
+    <div class="kpi">
+      <div class="kpi-value" id="blocks-found">0</div>
+      <div class="kpi-label">Solo mining lifetime total</div>
+    </div>
+  </div>
+
+  <!-- Devices Table -->
+  <div class="card card-wide">
+    <div class="card-title">Devices</div>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Device</th>
+          <th>Hashrate</th>
+          <th>Temp</th>
+          <th>Fan</th>
+          <th>Power</th>
+        </tr>
+      </thead>
+      <tbody id="devices-tbody">
+        <tr><td colspan="6" style="color:var(--text-2)">No devices registered</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Alerts -->
+  <div class="card">
+    <div class="card-title">Alerts</div>
+    <div id="alerts-container">
+      <div class="no-alerts">No active alerts</div>
+    </div>
+  </div>
+
+  <!-- Pool List -->
+  <div class="card card-full">
+    <div class="card-title">Pool Connections</div>
+    <div id="pools-container">
+      <div class="pool-item">
+        <div>
+          <div class="pool-url">No pools configured</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  LombokMiner v0.3.0 &mdash; <a href="https://github.com/codinglombok/lombokminer">github.com/codinglombok/lombokminer</a>
+  &mdash; Apache-2.0
+</footer>
+
+<script>
+(function() {
+  'use strict';
+
+  // ─── State ────────────────────────────────────────────────────
+  let ws = null;
+  let reconnectTimer = null;
+  const API_BASE = window.location.origin;
+
+  // ─── Formatting ───────────────────────────────────────────────
+  function fmtHashrate(hps) {
+    if (hps >= 1e18) return (hps / 1e18).toFixed(2) + ' EH/s';
+    if (hps >= 1e15) return (hps / 1e15).toFixed(2) + ' PH/s';
+    if (hps >= 1e12) return (hps / 1e12).toFixed(2) + ' TH/s';
+    if (hps >= 1e9)  return (hps / 1e9).toFixed(2)  + ' GH/s';
+    if (hps >= 1e6)  return (hps / 1e6).toFixed(2)  + ' MH/s';
+    if (hps >= 1e3)  return (hps / 1e3).toFixed(2)  + ' KH/s';
+    return hps.toFixed(2) + ' H/s';
+  }
+
+  function fmtUptime(secs) {
+    const d = Math.floor(secs / 86400);
+    const h = Math.floor((secs % 86400) / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    return d + 'd ' + h + 'h ' + m + 'm';
+  }
+
+  function tempClass(t) {
+    if (t >= 90) return 'temp-crit';
+    if (t >= 80) return 'temp-warn';
+    return 'temp-ok';
+  }
+
+  // ─── Render ───────────────────────────────────────────────────
+  function render(data) {
+    // Uptime
+    document.getElementById('uptime').textContent = fmtUptime(data.uptime_secs);
+
+    // Hashrate
+    const hr = fmtHashrate(data.total_hashrate).split(' ');
+    document.getElementById('hashrate').innerHTML =
+      hr[0] + '<span class="kpi-unit">' + hr[1] + '</span>';
+    document.getElementById('hashrate-label').textContent =
+      'Across ' + data.devices.length + ' device' + (data.devices.length !== 1 ? 's' : '');
+
+    // Blocks
+    document.getElementById('blocks-found').textContent = data.blocks_found;
+
+    // Shares (aggregate all pools)
+    let totalA = 0, totalR = 0, totalS = 0;
+    data.pools.forEach(function(p) {
+      totalA += p.accepted;
+      totalR += p.rejected;
+      totalS += p.stale;
+    });
+
+    const totalShares = totalA + totalR + totalS;
+    const acceptRate = totalShares > 0 ? (totalA / totalShares * 100).toFixed(2) : '100.00';
+
+    document.getElementById('shares-accepted').textContent = totalA.toLocaleString();
+    document.getElementById('shares-rate').textContent = 'Accept rate: ' + acceptRate + '%';
+    document.getElementById('legend-a').textContent = 'Accepted: ' + totalA.toLocaleString();
+    document.getElementById('legend-r').textContent = 'Rejected: ' + totalR.toLocaleString();
+    document.getElementById('legend-s').textContent = 'Stale: ' + totalS.toLocaleString();
+
+    // Share bar
+    const bar = document.getElementById('share-bar');
+    if (totalShares > 0) {
+      bar.innerHTML =
+        '<div class="share-bar-accepted" style="width:' + (totalA / totalShares * 100) + '%"></div>' +
+        '<div class="share-bar-rejected" style="width:' + (totalR / totalShares * 100) + '%"></div>' +
+        '<div class="share-bar-stale" style="width:' + (totalS / totalShares * 100) + '%"></div>';
+    }
+
+    // Devices
+    const tbody = document.getElementById('devices-tbody');
+    if (data.devices.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text-2)">No devices registered</td></tr>';
+    } else {
+      tbody.innerHTML = data.devices.map(function(d, i) {
+        const hr = fmtHashrate(d.hashrate);
+        const temp = d.temperature !== null
+          ? '<span class="' + tempClass(d.temperature) + '">' + d.temperature.toFixed(1) + '°C</span>'
+          : '—';
+        const fan = d.fan_rpm !== null ? d.fan_rpm + ' RPM' : '—';
+        const power = d.power_watts !== null ? d.power_watts.toFixed(0) + 'W' : '—';
+
+        return '<tr>' +
+          '<td>' + i + '</td>' +
+          '<td class="td-name">' + escapeHtml(d.name) + '</td>' +
+          '<td>' + hr + '</td>' +
+          '<td>' + temp + '</td>' +
+          '<td>' + fan + '</td>' +
+          '<td>' + power + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    // Pools
+    const poolsEl = document.getElementById('pools-container');
+    if (data.pools.length === 0) {
+      poolsEl.innerHTML = '<div class="pool-item"><div class="pool-url">No pools configured</div></div>';
+    } else {
+      poolsEl.innerHTML = data.pools.map(function(p, i) {
+        const isActive = i === 0;
+        const lat = p.latency_ms !== null ? p.latency_ms.toFixed(1) + 'ms' : '—';
+        return '<div class="pool-item">' +
+          '<div>' +
+            '<div class="pool-url">' + escapeHtml(p.url) + '</div>' +
+            '<div style="font-size:12px;color:var(--text-2);margin-top:2px">' +
+              'Accepted: ' + p.accepted.toLocaleString() +
+              ' · Rejected: ' + p.rejected +
+              ' · Latency: ' + lat +
+            '</div>' +
+          '</div>' +
+          '<span class="pool-tag ' + (isActive ? 'pool-tag-active' : 'pool-tag-standby') + '">' +
+            (isActive ? 'Active' : 'Standby') +
+          '</span>' +
+        '</div>';
+      }).join('');
+    }
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  // ─── WebSocket (real-time push) ───────────────────────────────
+  function connectWs() {
+    var proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(proto + '//' + window.location.host + '/ws');
+
+    ws.onopen = function() {
+      document.getElementById('ws-dot').className = 'status-dot connected';
+      document.getElementById('ws-status').textContent = 'Connected';
+    };
+
+    ws.onmessage = function(ev) {
+      try {
+        var data = JSON.parse(ev.data);
+        render(data);
+      } catch(e) { /* ignore malformed */ }
+    };
+
+    ws.onclose = function() {
+      document.getElementById('ws-dot').className = 'status-dot disconnected';
+      document.getElementById('ws-status').textContent = 'Reconnecting...';
+      reconnectTimer = setTimeout(connectWs, 3000);
+    };
+
+    ws.onerror = function() { ws.close(); };
+  }
+
+  // ─── Fallback: HTTP polling (if WebSocket not available) ──────
+  function pollMetrics() {
+    fetch(API_BASE + '/api/metrics')
+      .then(function(r) { return r.json(); })
+      .then(render)
+      .catch(function() {});
+  }
+
+  // ─── Demo mode (offline/standalone) ───────────────────────────
+  function startDemo() {
+    var tick = 0;
+    setInterval(function() {
+      tick++;
+      render({
+        uptime_secs: tick * 2,
+        total_hashrate: 188e12 + Math.random() * 2e12,
+        blocks_found: 0,
+        devices: [
+          {
+            name: 'Antminer S21 #0',
+            hashrate: 188e12 + Math.random() * 1e12,
+            temperature: 62 + Math.random() * 3,
+            fan_rpm: 3200 + Math.floor(Math.random() * 200),
+            power_watts: 3150 + Math.random() * 30,
+            hashes_total: 690e15 + tick * 188e12
+          },
+          {
+            name: 'RTX 4090 (testnet)',
+            hashrate: 1.2e9 + Math.random() * 0.1e9,
+            temperature: 70 + Math.random() * 4,
+            fan_rpm: 2100 + Math.floor(Math.random() * 100),
+            power_watts: 320 + Math.random() * 10,
+            hashes_total: 4.4e12 + tick * 1.2e9
+          }
+        ],
+        pools: [
+          { url: 'sv2://braiins.com:3336', accepted: 14237 + tick * 3, rejected: 12, stale: 3, latency_ms: 22 + Math.random() * 5 },
+          { url: 'stratum+tcp://backup.pool:3333', accepted: 0, rejected: 0, stale: 0, latency_ms: null }
+        ]
+      });
+    }, 2000);
+  }
+
+  // ─── Init ─────────────────────────────────────────────────────
+  // Try WebSocket first, fall back to polling, demo if standalone
+  if (window.location.hostname === '' || window.location.protocol === 'file:') {
+    startDemo();
+  } else {
+    try { connectWs(); } catch(e) { setInterval(pollMetrics, 5000); }
+  }
+})();
+</script>
+</body>
+</html>
